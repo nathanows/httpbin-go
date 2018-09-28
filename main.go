@@ -16,6 +16,7 @@ import (
 var seperator = "-----------------------------------------"
 var seed = genSeed()
 var listenPort string
+var excludedKeys = []string{"authorization", "password"}
 
 func main() {
 	listenPort = getEnv("PORT", "8080")
@@ -71,6 +72,9 @@ func logMap(title string, data map[string][]string) {
 	w := new(tabwriter.Writer)
 	w.Init(os.Stdout, 0, 8, 2, '\t', tabwriter.Debug|tabwriter.AlignRight)
 	for k, v := range data {
+		if stringInSlice(strings.ToLower(k), excludedKeys) {
+			continue
+		}
 		fmt.Fprintf(w, "%v\t \"%s\"\n", k, strings.Join(v, ","))
 	}
 	w.Flush()
@@ -95,4 +99,13 @@ func logRequestBody(req *http.Request) {
 func genSeed() int {
 	rand.Seed(time.Now().UTC().UnixNano())
 	return 1000 + rand.Intn(8999)
+}
+
+func stringInSlice(str string, list []string) bool {
+	for _, v := range list {
+		if v == str {
+			return true
+		}
+	}
+	return false
 }
