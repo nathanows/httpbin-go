@@ -8,7 +8,6 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
-	"os/exec"
 	"strings"
 	"text/tabwriter"
 	"time"
@@ -28,7 +27,6 @@ func main() {
 }
 
 func globHandler(w http.ResponseWriter, req *http.Request) {
-	logStart()
 	logRequest(req)
 
 	msg := fmt.Sprintf("[%d %s] It's all good baby, baby\n", seed, time.Now().Format("15:04:05"))
@@ -45,8 +43,6 @@ func getEnv(key, fallback string) string {
 }
 
 func logStart() {
-	clear()
-
 	fmt.Println(seperator)
 	fmt.Printf("Running with seed %d\n", seed)
 	fmt.Printf("Listening on %s\n", listenPort)
@@ -54,7 +50,10 @@ func logStart() {
 }
 
 func logRequest(req *http.Request) {
-	fmt.Printf("%s\n", time.Now().Format(time.RFC3339))
+	fmt.Println()
+	fmt.Println()
+	fmt.Println(seperator)
+	fmt.Printf("REQUEST @ %s\n", time.Now().Format(time.RFC3339))
 	fmt.Println(seperator)
 	fmt.Printf("%v %v %v\n", req.Method, req.Proto, req.URL.Path)
 	fmt.Printf("%v%v%v\n", req.URL.Scheme, req.Host, req.URL.RequestURI())
@@ -96,10 +95,4 @@ func logRequestBody(req *http.Request) {
 func genSeed() int {
 	rand.Seed(time.Now().UTC().UnixNano())
 	return 1000 + rand.Intn(8999)
-}
-
-func clear() {
-	cmd := exec.Command("clear") //Linux example, its tested
-	cmd.Stdout = os.Stdout
-	cmd.Run()
 }
