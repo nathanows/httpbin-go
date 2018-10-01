@@ -1,7 +1,6 @@
 package httpbin
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -18,12 +17,11 @@ func NewServer(router *mux.Router) (*Server, error) {
 	server := &Server{
 		router: router,
 	}
-	server.initRoutes() // register handlers
+	server.initRoutes()
 	return server, nil
 }
 
 // ListenAndServe starts the http listener
 func (s *Server) ListenAndServe() {
-	log.Fatal(http.ListenAndServe(":8080", s.router))
+	log.Fatal(http.ListenAndServe("0.0.0.0:8080", s.router))
 }
-

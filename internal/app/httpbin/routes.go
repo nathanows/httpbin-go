@@ -1,5 +1,6 @@
 package httpbin
 
 func (s *Server) initRoutes() {
-	s.router.HandleFunc("/something", s.handleSomething())
+	// HTTP Methods
+	s.router.HandleFunc("/delete", s.handleDelete()).Methods("DELETE")
 }
