@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"reflect"
 	"strings"
 )
 
@@ -19,15 +20,19 @@ type Request struct {
 	URL     string            `json:"url"`
 }
 
+type requestKeys []string
+
 // RequestToJSON parses an incoming http request and returns a bytes.Buffer
 // containing a properly indented, JSON formatted httpbin.Request
-func RequestToJSON(r *http.Request) ([]byte, error) {
-	req, err := ParseRequest(r)
+func RequestToJSON(r *http.Request, keys requestKeys) ([]byte, error) {
+	req, err := parseRequest(r)
 	if err != nil {
 		return nil, err
 	}
 
-	json, err := req.ToJSON()
+	requestedKeys := req.selectKeys(keys)
+
+	json, err := toJSON(requestedKeys)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal to json: %v", err)
 	}
@@ -35,8 +40,7 @@ func RequestToJSON(r *http.Request) ([]byte, error) {
 	return json, nil
 }
 
-// ParseRequest transforms an http.Request in to a httpbin.Request
-func ParseRequest(r *http.Request) (*Request, error) {
+func parseRequest(r *http.Request) (*Request, error) {
 	return &Request{
 		Args:    getArgs(r),
 		Data:    "",
@@ -49,9 +53,8 @@ func ParseRequest(r *http.Request) (*Request, error) {
 	}, nil
 }
 
-// ToJSON marshals an httpbin.Request to a bytes.Buffer
-func (req *Request) ToJSON() ([]byte, error) {
-	response, err := json.MarshalIndent(req, "", "  ")
+func toJSON(in map[string]interface{}) ([]byte, error) {
+	response, err := json.MarshalIndent(in, "", "  ")
 	if err != nil {
 		return nil, err
 	}
@@ -99,4 +102,26 @@ func getArgs(r *http.Request) map[string]string {
 		args[key] = strings.Join(vals, ",")
 	}
 	return args
+}
+
+func keySet(keys requestKeys) map[string]bool {
+	set := make(map[string]bool, len(keys))
+	for _, s := range keys {
+		set[s] = true
+	}
+	return set
+}
+
+func (req *Request) selectKeys(keys requestKeys) map[string]interface{} {
+	ks := keySet(keys)
+	rt, rv := reflect.TypeOf(*req), reflect.ValueOf(*req)
+	out := make(map[string]interface{}, rt.NumField())
+	for i := 0; i < rt.NumField(); i++ {
+		field := rt.Field(i)
+		jsonKey := field.Tag.Get("json")
+		if ks[jsonKey] {
+			out[jsonKey] = rv.Field(i).Interface()
+		}
+	}
+	return out
 }

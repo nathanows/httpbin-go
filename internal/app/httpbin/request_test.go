@@ -12,7 +12,7 @@ import (
 func TestParseRequest_URL_AbsTarget(t *testing.T) {
 	target := "http://hbg.com/delete?some_param=2"
 	r := httptest.NewRequest("DELETE", target, nil)
-	hbr, err := ParseRequest(r)
+	hbr, err := parseRequest(r)
 	if err != nil {
 		t.Errorf("Failed to ParseRequest. Err: %v", err)
 	}
@@ -29,7 +29,7 @@ func TestParseRequest_URL_RelTarget(t *testing.T) {
 		URL:  url,
 		Host: "localhost:8080",
 	}
-	hbr, err := ParseRequest(r)
+	hbr, err := parseRequest(r)
 	if err != nil {
 		t.Errorf("Failed to ParseRequest. Err: %v", err)
 	}
@@ -48,7 +48,7 @@ func TestParseRequest_Headers(t *testing.T) {
 	headers["Accept"] = []string{"*/*"}
 	r.Header = headers
 
-	hbr, err := ParseRequest(r)
+	hbr, err := parseRequest(r)
 	if err != nil {
 		t.Errorf("Failed to ParseRequest. Err: %v", err)
 	}
@@ -65,7 +65,7 @@ func TestParseRequest_Origin(t *testing.T) {
 	target := "http://hbg.com/get"
 	r := httptest.NewRequest("GET", target, nil)
 
-	hbr, err := ParseRequest(r)
+	hbr, err := parseRequest(r)
 	if err != nil {
 		t.Errorf("Failed to ParseRequest. Err: %v", err)
 	}
@@ -84,7 +84,7 @@ func TestParseRequest_Origin_Forwarded(t *testing.T) {
 	headers["X-Forwarded-For"] = []string{"1.1.1.1"}
 	r.Header = headers
 
-	hbr, err := ParseRequest(r)
+	hbr, err := parseRequest(r)
 	if err != nil {
 		t.Errorf("Failed to ParseRequest. Err: %v", err)
 	}
@@ -99,7 +99,7 @@ func TestParseRequest_Args(t *testing.T) {
 	target := "http://hbg.com/get?test=test1,test2&Something=1"
 	r := httptest.NewRequest("GET", target, nil)
 
-	hbr, err := ParseRequest(r)
+	hbr, err := parseRequest(r)
 	if err != nil {
 		t.Errorf("Failed to ParseRequest. Err: %v", err)
 	}
@@ -121,7 +121,9 @@ func TestToJSON(t *testing.T) {
 		JSON:    "",
 	}
 
-	reqJSON, err := req.ToJSON()
+	requestedKeys := req.selectKeys(requestKeys{"args", "data", "headers", "url", "json"})
+
+	reqJSON, err := toJSON(requestedKeys)
 	if err != nil {
 		t.Errorf("Unable to marshal Request to JSON. Err: %v", err)
 	}
@@ -154,7 +156,9 @@ func TestRequestToJSON(t *testing.T) {
 	target := "http://hbg.com/get?test=test1,test2&Something=1"
 	r := httptest.NewRequest("GET", target, nil)
 
-	reqJSON, err := RequestToJSON(r)
+	requestedKeys := requestKeys{"args", "url"}
+
+	reqJSON, err := RequestToJSON(r, requestedKeys)
 	if err != nil {
 		t.Errorf("Unable to marshal Request to JSON. Err: %v", err)
 	}
@@ -171,6 +175,41 @@ func TestRequestToJSON(t *testing.T) {
 		{"args.test", "test1,test2"},
 		{"args.Something", "1"},
 		{"url", target},
+	}
+
+	for _, tc := range testCases {
+		if val := jsonParsed.Path(tc.jsonPath).String(); val != tc.expected {
+			t.Errorf("Incorrect val after unmarshal; expected: %v, got: %v", tc.expected, val)
+		}
+	}
+}
+
+func TestSelectKeys(t *testing.T) {
+	target := "http://hbg.com/get?test=test1,test2&Something=1"
+	r := httptest.NewRequest("GET", target, nil)
+
+	requestedKeys := requestKeys{"args"}
+
+	reqJSON, err := RequestToJSON(r, requestedKeys)
+	if err != nil {
+		t.Errorf("Unable to marshal Request to JSON. Err: %v", err)
+	}
+
+	jsonParsed, err := jsonparser.ParseJSON(reqJSON)
+	if err != nil {
+		t.Errorf("Unable to parse returned JSON. Err: %v", err)
+	}
+
+	testCases := []struct {
+		jsonPath string
+		expected string
+	}{
+		{"args.test", "test1,test2"},
+		{"args.Something", "1"},
+		{"url", ""},
+		{"origin", ""},
+		{"files", ""},
+		{"headers", ""},
 	}
 
 	for _, tc := range testCases {
