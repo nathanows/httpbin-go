@@ -23,20 +23,24 @@ type Request struct {
 // ParseRequestToJSON parses an incoming http request and returns a bytes.Buffer
 // containing a properly indented, JSON formatted httpbin.Request
 func ParseRequestToJSON(r *http.Request) (*bytes.Buffer, error) {
-	req, err := parseRequest(r)
+	req, err := ParseRequest(r)
 	if err != nil {
 		return nil, err
 	}
 
-	buf, err := req.toJSON()
+	json, err := req.ToJSON()
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal to json: %v", err)
 	}
 
+	buf := new(bytes.Buffer)
+	buf.Write(json)
+	buf.Write([]byte("\n"))
 	return buf, nil
 }
 
-func parseRequest(r *http.Request) (*Request, error) {
+// ParseRequest transforms an http.Request in to a httpbin.Request
+func ParseRequest(r *http.Request) (*Request, error) {
 	return &Request{
 		Args:    getArgs(r),
 		Data:    "",
@@ -49,7 +53,21 @@ func parseRequest(r *http.Request) (*Request, error) {
 	}, nil
 }
 
+// ToJSON marshals an httpbin.Request to a bytes.Buffer
+func (req *Request) ToJSON() ([]byte, error) {
+	response, err := json.MarshalIndent(req, "", "  ")
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
+}
+
 func getURL(r *http.Request) string {
+	if r.URL.IsAbs() {
+		return r.URL.String()
+	}
+
 	scheme := r.URL.Scheme
 	if scheme == "" {
 		if r.TLS == nil {
@@ -84,16 +102,4 @@ func getArgs(r *http.Request) map[string]string {
 		args[key] = strings.Join(vals, ",")
 	}
 	return args
-}
-
-func (req *Request) toJSON() (*bytes.Buffer, error) {
-	response, err := json.Marshal(req)
-	if err != nil {
-		return nil, err
-	}
-
-	buf := new(bytes.Buffer)
-	err = json.Indent(buf, response, "", "  ")
-	buf.Write([]byte("\n"))
-	return buf, nil
 }
