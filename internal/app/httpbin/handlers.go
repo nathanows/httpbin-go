@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func (s *Server) handleDelete() http.HandlerFunc {
+func (s *Server) HandleDelete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		json, err := RequestToJSON(r)
 		if err != nil {
