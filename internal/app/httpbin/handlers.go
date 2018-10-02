@@ -5,6 +5,8 @@ import (
 	"net/http"
 )
 
+// HTTP Handlers
+
 func (s *Server) handleDelete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		keys := requestKeys{"args", "data", "files", "form", "headers", "json", "origin", "url"}
@@ -37,6 +39,15 @@ func (s *Server) handlePut() http.HandlerFunc {
 func (s *Server) handlePost() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		keys := requestKeys{"args", "data", "files", "form", "headers", "json", "origin", "url"}
+		returnRequestAsJSON(w, r, keys)
+	}
+}
+
+// Anything Handlers
+
+func (s *Server) handleAnything() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		keys := requestKeys{"args", "data", "files", "form", "headers", "json", "method", "origin", "url"}
 		returnRequestAsJSON(w, r, keys)
 	}
 }

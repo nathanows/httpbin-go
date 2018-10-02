@@ -18,6 +18,7 @@ type Request struct {
 	JSON    string            `json:"json"`
 	Origin  string            `json:"origin"`
 	URL     string            `json:"url"`
+	Method  string            `json:"method"`
 }
 
 type requestKeys []string
@@ -48,6 +49,7 @@ func parseRequest(r *http.Request) (*Request, error) {
 		Form:    make(map[string]string),
 		Headers: getHeaders(r),
 		JSON:    "",
+		Method:  getMethod(r),
 		Origin:  getOrigin(r),
 		URL:     getURL(r),
 	}, nil
@@ -102,6 +104,10 @@ func getArgs(r *http.Request) map[string]string {
 		args[key] = strings.Join(vals, ",")
 	}
 	return args
+}
+
+func getMethod(r *http.Request) string {
+	return r.Method
 }
 
 func keySet(keys requestKeys) map[string]bool {

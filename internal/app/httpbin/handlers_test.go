@@ -144,6 +144,33 @@ func TestHandlePost(t *testing.T) {
 	validateCorrectFields(t, []string{"args", "data", "files", "form", "headers", "json", "origin", "url"}, jsonParsed)
 }
 
+func TestHandleAnything(t *testing.T) {
+	target := "http://test.com/anything/test?something=post"
+	headers := map[string][]string{"Accept": []string{"*/*"}}
+	jsonParsed, err := makeRequest(emptyServer.handleAnything(), target, "POST", headers)
+	if err != nil {
+		t.Errorf("Failed to make and parse request. Err: %v", err)
+	}
+
+	testCases := []struct {
+		jsonPath string
+		expected string
+	}{
+		{"args.something", "post"},
+		{"headers.Accept", "*/*"},
+		{"url", target},
+		{"method", "POST"},
+	}
+
+	for _, tc := range testCases {
+		if val := jsonParsed.Path(tc.jsonPath).String(); val != tc.expected {
+			t.Errorf("Incorrect val after unmarshal; expected: %v, got: %v", tc.expected, val)
+		}
+	}
+
+	validateCorrectFields(t, []string{"args", "data", "files", "form", "headers", "json", "method", "origin", "url"}, jsonParsed)
+}
+
 func makeRequest(handlerFunc http.HandlerFunc, target, method string, headers map[string][]string) (*jsonparser.Container, error) {
 	req, err := http.NewRequest(method, target, nil)
 	if err != nil {
@@ -174,7 +201,7 @@ func validateCorrectFields(t *testing.T, expected []string, json *jsonparser.Con
 		}
 	}
 
-	allFields := []string{"args", "data", "files", "form", "headers", "json", "origin", "url"}
+	allFields := []string{"args", "data", "files", "form", "headers", "json", "method", "origin", "url"}
 	expectedNotIncluced := sliceDiff(allFields, expected)
 
 	for _, field := range expectedNotIncluced {
