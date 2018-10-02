@@ -1,7 +1,6 @@
 package httpbin
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -20,9 +19,9 @@ type Request struct {
 	URL     string            `json:"url"`
 }
 
-// ParseRequestToJSON parses an incoming http request and returns a bytes.Buffer
+// RequestToJSON parses an incoming http request and returns a bytes.Buffer
 // containing a properly indented, JSON formatted httpbin.Request
-func ParseRequestToJSON(r *http.Request) (*bytes.Buffer, error) {
+func RequestToJSON(r *http.Request) ([]byte, error) {
 	req, err := ParseRequest(r)
 	if err != nil {
 		return nil, err
@@ -33,10 +32,7 @@ func ParseRequestToJSON(r *http.Request) (*bytes.Buffer, error) {
 		return nil, fmt.Errorf("failed to marshal to json: %v", err)
 	}
 
-	buf := new(bytes.Buffer)
-	buf.Write(json)
-	buf.Write([]byte("\n"))
-	return buf, nil
+	return json, nil
 }
 
 // ParseRequest transforms an http.Request in to a httpbin.Request
@@ -59,6 +55,7 @@ func (req *Request) ToJSON() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	response = append(response, "\n"...)
 
 	return response, nil
 }

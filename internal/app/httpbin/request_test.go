@@ -150,6 +150,32 @@ func TestToJSON(t *testing.T) {
 	}
 }
 
-func TestParseRequestToJSON(t *testing.T) {
+func TestRequestToJSON(t *testing.T) {
+	target := "http://hbg.com/get?test=test1,test2&Something=1"
+	r := httptest.NewRequest("GET", target, nil)
 
+	reqJSON, err := RequestToJSON(r)
+	if err != nil {
+		t.Errorf("Unable to marshal Request to JSON. Err: %v", err)
+	}
+
+	jsonParsed, err := jsonparser.ParseJSON(reqJSON)
+	if err != nil {
+		t.Errorf("Unable to parse returned JSON. Err: %v", err)
+	}
+
+	testCases := []struct {
+		jsonPath string
+		expected string
+	}{
+		{"args.test", "test1,test2"},
+		{"args.Something", "1"},
+		{"url", target},
+	}
+
+	for _, tc := range testCases {
+		if val := jsonParsed.Path(tc.jsonPath).String(); val != tc.expected {
+			t.Errorf("Incorrect val after unmarshal; expected: %v, got: %v", tc.expected, val)
+		}
+	}
 }

@@ -7,7 +7,7 @@ import (
 
 func (s *Server) handleDelete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		buf, err := ParseRequestToJSON(r)
+		json, err := RequestToJSON(r)
 		if err != nil {
 			fmt.Println(err.Error())
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -15,6 +15,6 @@ func (s *Server) handleDelete() http.HandlerFunc {
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		buf.WriteTo(w)
+		w.Write(json)
 	}
 }
