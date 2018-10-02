@@ -1,6 +1,7 @@
 package httpbin
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -8,27 +9,14 @@ import (
 	"github.com/ndwhtlssthr/httpbin-go/pkg/jsonparser"
 )
 
+var emptyServer = &Server{}
+
 func TestHandleDelete(t *testing.T) {
 	target := "http://test.com/delete?something=good"
-	req, err := http.NewRequest("DELETE", target, nil)
+	headers := map[string][]string{"Accept": []string{"*/*"}}
+	jsonParsed, err := makeRequest(emptyServer.handleDelete(), target, "DELETE", headers)
 	if err != nil {
-		t.Errorf("Unable to build request. Err: %v", err)
-	}
-	req.Header = map[string][]string{"Accept": []string{"*/*"}}
-
-	rr := httptest.NewRecorder()
-
-	server := &Server{}
-	http.HandlerFunc(server.handleDelete()).
-		ServeHTTP(rr, req)
-
-	if status := rr.Code; status != http.StatusOK {
-		t.Errorf("Status code differs. Expected %d .\n Got %d instead", http.StatusOK, status)
-	}
-
-	jsonParsed, err := jsonparser.ParseJSON(rr.Body.Bytes())
-	if err != nil {
-		t.Errorf("Unable to parse returned JSON. Err: %v", err)
+		t.Errorf("Failed to make and parse request. Err: %v", err)
 	}
 
 	testCases := []struct {
@@ -46,49 +34,19 @@ func TestHandleDelete(t *testing.T) {
 		}
 	}
 
-	includedFieldTestCases := []struct {
-		field    string
-		excluded bool
-	}{
-		{"args", true},
-		{"data", true},
-		{"files", true},
-		{"form", true},
-		{"headers", true},
-		{"json", true},
-		{"origin", true},
-		{"url", true},
-	}
-
-	for _, tc := range includedFieldTestCases {
-		if val := jsonParsed.Path(tc.field).Data(); (val == nil) == tc.excluded {
-			t.Errorf("Expected field %s inclusion: %v, was %v", tc.field, tc.excluded, !tc.excluded)
-		}
-	}
+	validateCorrectFields(t, []string{"args", "data", "files", "form", "headers", "json", "origin", "url"}, jsonParsed)
 }
 
 func TestHandleGet(t *testing.T) {
 	target := "http://test.com/get?something=else"
-	req, err := http.NewRequest("GET", target, nil)
+	headers := map[string][]string{"Accept": []string{"*/*"}}
+	jsonParsed, err := makeRequest(emptyServer.handleGet(), target, "GET", headers)
 	if err != nil {
-		t.Errorf("Unable to build request. Err: %v", err)
-	}
-	req.Header = map[string][]string{"Accept": []string{"*/*"}}
-
-	rr := httptest.NewRecorder()
-
-	server := &Server{}
-	http.HandlerFunc(server.handleGet()).
-		ServeHTTP(rr, req)
-
-	if status := rr.Code; status != http.StatusOK {
-		t.Errorf("Status code differs. Expected %d .\n Got %d instead", http.StatusOK, status)
+		t.Errorf("Failed to make and parse request. Err: %v", err)
 	}
 
-	jsonParsed, err := jsonparser.ParseJSON(rr.Body.Bytes())
-	if err != nil {
-		t.Errorf("Unable to parse returned JSON. Err: %v", err)
-	}
+	fmt.Println("here in GET")
+	fmt.Printf("%#v\n", jsonParsed)
 
 	testCases := []struct {
 		jsonPath string
@@ -105,48 +63,15 @@ func TestHandleGet(t *testing.T) {
 		}
 	}
 
-	includedFieldTestCases := []struct {
-		field    string
-		excluded bool
-	}{
-		{"args", true},
-		{"data", false},
-		{"files", false},
-		{"form", false},
-		{"headers", true},
-		{"json", false},
-		{"origin", true},
-		{"url", true},
-	}
-
-	for _, tc := range includedFieldTestCases {
-		if val := jsonParsed.Path(tc.field).Data(); (val == nil) == tc.excluded {
-			t.Errorf("Expected field %s inclusion: %v, was %v", tc.field, tc.excluded, !tc.excluded)
-		}
-	}
+	validateCorrectFields(t, []string{"args", "headers", "origin", "url"}, jsonParsed)
 }
 
 func TestHandlePatch(t *testing.T) {
 	target := "http://test.com/patch?something=patched"
-	req, err := http.NewRequest("PATCH", target, nil)
+	headers := map[string][]string{"Accept": []string{"*/*"}}
+	jsonParsed, err := makeRequest(emptyServer.handlePatch(), target, "PATCH", headers)
 	if err != nil {
-		t.Errorf("Unable to build request. Err: %v", err)
-	}
-	req.Header = map[string][]string{"Accept": []string{"*/*"}}
-
-	rr := httptest.NewRecorder()
-
-	server := &Server{}
-	http.HandlerFunc(server.handlePatch()).
-		ServeHTTP(rr, req)
-
-	if status := rr.Code; status != http.StatusOK {
-		t.Errorf("Status code differs. Expected %d .\n Got %d instead", http.StatusOK, status)
-	}
-
-	jsonParsed, err := jsonparser.ParseJSON(rr.Body.Bytes())
-	if err != nil {
-		t.Errorf("Unable to parse returned JSON. Err: %v", err)
+		t.Errorf("Failed to make and parse request. Err: %v", err)
 	}
 
 	testCases := []struct {
@@ -164,48 +89,15 @@ func TestHandlePatch(t *testing.T) {
 		}
 	}
 
-	includedFieldTestCases := []struct {
-		field    string
-		excluded bool
-	}{
-		{"args", true},
-		{"data", true},
-		{"files", true},
-		{"form", true},
-		{"headers", true},
-		{"json", true},
-		{"origin", true},
-		{"url", true},
-	}
-
-	for _, tc := range includedFieldTestCases {
-		if val := jsonParsed.Path(tc.field).Data(); (val == nil) == tc.excluded {
-			t.Errorf("Expected field %s inclusion: %v, was %v", tc.field, tc.excluded, !tc.excluded)
-		}
-	}
+	validateCorrectFields(t, []string{"args", "data", "files", "form", "headers", "json", "origin", "url"}, jsonParsed)
 }
 
 func TestHandlePut(t *testing.T) {
 	target := "http://test.com/put?something=put"
-	req, err := http.NewRequest("PUT", target, nil)
+	headers := map[string][]string{"Accept": []string{"*/*"}}
+	jsonParsed, err := makeRequest(emptyServer.handlePut(), target, "PUT", headers)
 	if err != nil {
-		t.Errorf("Unable to build request. Err: %v", err)
-	}
-	req.Header = map[string][]string{"Accept": []string{"*/*"}}
-
-	rr := httptest.NewRecorder()
-
-	server := &Server{}
-	http.HandlerFunc(server.handlePut()).
-		ServeHTTP(rr, req)
-
-	if status := rr.Code; status != http.StatusOK {
-		t.Errorf("Status code differs. Expected %d .\n Got %d instead", http.StatusOK, status)
-	}
-
-	jsonParsed, err := jsonparser.ParseJSON(rr.Body.Bytes())
-	if err != nil {
-		t.Errorf("Unable to parse returned JSON. Err: %v", err)
+		t.Errorf("Failed to make and parse request. Err: %v", err)
 	}
 
 	testCases := []struct {
@@ -223,48 +115,15 @@ func TestHandlePut(t *testing.T) {
 		}
 	}
 
-	includedFieldTestCases := []struct {
-		field    string
-		excluded bool
-	}{
-		{"args", true},
-		{"data", true},
-		{"files", true},
-		{"form", true},
-		{"headers", true},
-		{"json", true},
-		{"origin", true},
-		{"url", true},
-	}
-
-	for _, tc := range includedFieldTestCases {
-		if val := jsonParsed.Path(tc.field).Data(); (val == nil) == tc.excluded {
-			t.Errorf("Expected field %s inclusion: %v, was %v", tc.field, tc.excluded, !tc.excluded)
-		}
-	}
+	validateCorrectFields(t, []string{"args", "data", "files", "form", "headers", "json", "origin", "url"}, jsonParsed)
 }
 
 func TestHandlePost(t *testing.T) {
 	target := "http://test.com/post?something=post"
-	req, err := http.NewRequest("POST", target, nil)
+	headers := map[string][]string{"Accept": []string{"*/*"}}
+	jsonParsed, err := makeRequest(emptyServer.handlePost(), target, "POST", headers)
 	if err != nil {
-		t.Errorf("Unable to build request. Err: %v", err)
-	}
-	req.Header = map[string][]string{"Accept": []string{"*/*"}}
-
-	rr := httptest.NewRecorder()
-
-	server := &Server{}
-	http.HandlerFunc(server.handlePost()).
-		ServeHTTP(rr, req)
-
-	if status := rr.Code; status != http.StatusOK {
-		t.Errorf("Status code differs. Expected %d .\n Got %d instead", http.StatusOK, status)
-	}
-
-	jsonParsed, err := jsonparser.ParseJSON(rr.Body.Bytes())
-	if err != nil {
-		t.Errorf("Unable to parse returned JSON. Err: %v", err)
+		t.Errorf("Failed to make and parse request. Err: %v", err)
 	}
 
 	testCases := []struct {
@@ -282,23 +141,71 @@ func TestHandlePost(t *testing.T) {
 		}
 	}
 
-	includedFieldTestCases := []struct {
-		field    string
-		excluded bool
-	}{
-		{"args", true},
-		{"data", true},
-		{"files", true},
-		{"form", true},
-		{"headers", true},
-		{"json", true},
-		{"origin", true},
-		{"url", true},
+	validateCorrectFields(t, []string{"args", "data", "files", "form", "headers", "json", "origin", "url"}, jsonParsed)
+}
+
+func makeRequest(handlerFunc http.HandlerFunc, target, method string, headers map[string][]string) (*jsonparser.Container, error) {
+	req, err := http.NewRequest(method, target, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header = headers
+
+	rr := httptest.NewRecorder()
+
+	handlerFunc.ServeHTTP(rr, req)
+
+	if status := rr.Code; status != http.StatusOK {
+		return nil, fmt.Errorf("Status code differs. Expected %d .\n Got %d instead", http.StatusOK, status)
 	}
 
-	for _, tc := range includedFieldTestCases {
-		if val := jsonParsed.Path(tc.field).Data(); (val == nil) == tc.excluded {
-			t.Errorf("Expected field %s inclusion: %v, was %v", tc.field, tc.excluded, !tc.excluded)
+	jsonParsed, err := jsonparser.ParseJSON(rr.Body.Bytes())
+	if err != nil {
+		return nil, fmt.Errorf("Unable to parse returned JSON. Err: %v", err)
+	}
+
+	return jsonParsed, nil
+}
+
+func validateCorrectFields(t *testing.T, expected []string, json *jsonparser.Container) {
+	for _, field := range expected {
+		if val := json.Path(field).Data(); val == nil {
+			t.Errorf("Expected field %s to be included in response", field)
 		}
 	}
+
+	allFields := []string{"args", "data", "files", "form", "headers", "json", "origin", "url"}
+	expectedNotIncluced := sliceDiff(allFields, expected)
+
+	for _, field := range expectedNotIncluced {
+		if val := json.Path(field).Data(); val != nil {
+			fmt.Printf("%#v\n", val)
+			t.Errorf("%s should not be included in response, got: %s", field, json.Path(field).String())
+		}
+	}
+
+}
+
+func sliceDiff(slice1 []string, slice2 []string) []string {
+	var diff []string
+
+	for i := 0; i < 2; i++ {
+		for _, s1 := range slice1 {
+			found := false
+			for _, s2 := range slice2 {
+				if s1 == s2 {
+					found = true
+					break
+				}
+			}
+			if !found {
+				diff = append(diff, s1)
+			}
+		}
+		if i == 0 {
+			slice1, slice2 = slice2, slice1
+		}
+	}
+
+	return diff
 }

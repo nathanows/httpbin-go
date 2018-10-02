@@ -14,6 +14,7 @@ func (s *Server) handleDelete() http.HandlerFunc {
 
 func (s *Server) handleGet() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("in get")
 		keys := requestKeys{"url", "args", "headers", "origin"}
 		returnRequestAsJSON(w, r, keys)
 	}
