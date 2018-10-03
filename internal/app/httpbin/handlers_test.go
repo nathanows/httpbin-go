@@ -1,6 +1,7 @@
 package httpbin
 
 import (
+	"encoding/base64"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -12,11 +13,16 @@ import (
 )
 
 var emptyServer = &Server{}
-var possibleResponseFields = []string{"args", "data", "files", "form", "headers", "json", "method", "origin", "url", "user-agent"}
+var possibleResponseFields = []string{"args", "authenticated", "data", "files", "form", "headers", "json", "method", "origin", "url", "user", "user-agent"}
 
 type jsonAssertion []struct {
 	jsonPath string
 	expected string
+}
+
+type jsonBoolAssertion []struct {
+	jsonPath string
+	expected bool
 }
 
 func TestHandleDelete(t *testing.T) {
@@ -299,6 +305,39 @@ func TestHandleUserAgent(t *testing.T) {
 	}
 }
 
+func TestHandleBasicAuth(t *testing.T) {
+	user := "steve"
+	pass := "s3cr3t"
+	target := fmt.Sprintf("http://test.com/basic-auth/%s/%s", user, pass)
+	base64Auth := base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", user, pass)))
+	authHeader := fmt.Sprintf("Basic %s", base64Auth)
+	headers := map[string][]string{"Authorization": []string{authHeader}}
+	req := newTestRequest(emptyServer.handleBasicAuth(), target, "GET", testReqHeaders(headers))
+	req.baseRequest = mux.SetURLVars(req.baseRequest, map[string]string{"user": user, "password": pass})
+	if err := req.make(); err != nil {
+		t.Errorf("Failed to make request. Err: %v", err)
+	}
+
+	testCases := jsonAssertion{
+		{"user", user},
+	}
+
+	if err := req.validateStatusCode(); err != nil {
+		t.Errorf("Failed request base validations. Failure: %v", err)
+	}
+	if err := req.runTestCases(testCases); err != nil {
+		t.Errorf("Failed test case. Failure: %v", err)
+	}
+
+	if val := req.parsedJSON.Path("authenticated").Data(); val != true {
+		t.Errorf("Expected 'authenticated' to be 'true', got: %v", val)
+	}
+	expectedResponseKeys := []string{"authenticated", "user"}
+	if err := req.validateCorrectFields(expectedResponseKeys); err != nil {
+		t.Errorf("Incorrect response keys returned. Failure: %v", err)
+	}
+}
+
 type testRequest struct {
 	baseRequest *http.Request
 
@@ -392,7 +431,7 @@ func (tr *testRequest) validateStatusCode() error {
 func (tr *testRequest) runTestCases(testCases jsonAssertion) error {
 	for _, tc := range testCases {
 		if val := tr.parsedJSON.Path(tc.jsonPath).String(); val != tc.expected {
-			return fmt.Errorf("Incorrect val after unmarshal; expected: %v, got: %v", tc.expected, val)
+			return fmt.Errorf("Incorrect val after unmarshal; for %v, expected: %v, got: %v", tc.jsonPath, tc.expected, val)
 		}
 	}
 	return nil

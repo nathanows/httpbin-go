@@ -1,6 +1,8 @@
 package httpbin
 
 import (
+	"crypto/subtle"
+	"encoding/json"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -95,6 +97,41 @@ func (s *Server) handleUserAgent() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		keys := requestKeys{"user-agent"}
 		returnRequestAsJSON(w, r, keys)
+	}
+}
+
+// Auth Handlers
+
+func (s *Server) handleBasicAuth() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		username := vars["user"]
+		password := vars["password"]
+
+		user, pass, ok := r.BasicAuth()
+
+		if !ok || subtle.ConstantTimeCompare([]byte(user), []byte(username)) != 1 || subtle.ConstantTimeCompare([]byte(pass), []byte(password)) != 1 {
+			w.Header().Set("WWW-Authenticate", `Basic realm="Fake Realm"`)
+			w.WriteHeader(401)
+			w.Write([]byte("Unauthorized.\n"))
+			return
+		}
+
+		type authResponse struct {
+			Authenticated bool   `json:"authenticated"`
+			User          string `json:"user"`
+		}
+
+		resp := authResponse{Authenticated: true, User: username}
+		jsonResp, err := json.MarshalIndent(resp, "", "  ")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		jsonResp = append(jsonResp, "\n"...)
+
+		w.WriteHeader(http.StatusOK)
+		w.Write(jsonResp)
 	}
 }
 
