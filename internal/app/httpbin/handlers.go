@@ -1,8 +1,13 @@
 package httpbin
 
 import (
-	"fmt"
+	"math/rand"
 	"net/http"
+	"strconv"
+	"strings"
+	"time"
+
+	"github.com/gorilla/mux"
 )
 
 // HTTP Handlers
@@ -16,7 +21,6 @@ func (s *Server) handleDelete() http.HandlerFunc {
 
 func (s *Server) handleGet() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println("in get")
 		keys := requestKeys{"url", "args", "headers", "origin"}
 		returnRequestAsJSON(w, r, keys)
 	}
@@ -52,10 +56,28 @@ func (s *Server) handleAnything() http.HandlerFunc {
 	}
 }
 
+// Status Codes Handlers
+
+func (s *Server) handleStatusCodes() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		strCodes := strings.Split(vars["codes"], ",")
+		var codes []int
+		for _, code := range strCodes {
+			i, err := strconv.Atoi(code)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
+			codes = append(codes, i)
+		}
+		rand.Seed(time.Now().Unix())
+		w.WriteHeader(codes[rand.Intn(len(codes))])
+	}
+}
+
 func returnRequestAsJSON(w http.ResponseWriter, r *http.Request, keys requestKeys) {
 	json, err := RequestToJSON(r, keys)
 	if err != nil {
-		fmt.Println(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 

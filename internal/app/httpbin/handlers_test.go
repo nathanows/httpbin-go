@@ -4,213 +4,314 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
+	"github.com/gorilla/mux"
 	"github.com/ndwhtlssthr/httpbin-go/pkg/jsonparser"
 )
 
 var emptyServer = &Server{}
+var possibleResponseFields = []string{"args", "data", "files", "form", "headers", "json", "method", "origin", "url"}
+
+type jsonAssertion []struct {
+	jsonPath string
+	expected string
+}
 
 func TestHandleDelete(t *testing.T) {
 	target := "http://test.com/delete?something=good"
 	headers := map[string][]string{"Accept": []string{"*/*"}}
-	jsonParsed, err := makeRequest(emptyServer.handleDelete(), target, "DELETE", headers)
-	if err != nil {
-		t.Errorf("Failed to make and parse request. Err: %v", err)
+	req := newTestRequest(emptyServer.handleDelete(), target, "DELETE", testReqHeaders(headers))
+	if err := req.make(); err != nil {
+		t.Errorf("Failed to make request. Err: %v", err)
 	}
 
-	testCases := []struct {
-		jsonPath string
-		expected string
-	}{
+	testCases := jsonAssertion{
 		{"args.something", "good"},
 		{"headers.Accept", "*/*"},
 		{"url", target},
 	}
 
-	for _, tc := range testCases {
-		if val := jsonParsed.Path(tc.jsonPath).String(); val != tc.expected {
-			t.Errorf("Incorrect val after unmarshal; expected: %v, got: %v", tc.expected, val)
-		}
+	if err := req.validateStatusCode(); err != nil {
+		t.Errorf("Failed request base validations. Failure: %v", err)
 	}
-
-	validateCorrectFields(t, []string{"args", "data", "files", "form", "headers", "json", "origin", "url"}, jsonParsed)
+	if err := req.runTestCases(testCases); err != nil {
+		t.Errorf("Failed test case. Failure: %v", err)
+	}
+	expectedResponseKeys := []string{"args", "data", "files", "form", "headers", "json", "origin", "url"}
+	if err := req.validateCorrectFields(expectedResponseKeys); err != nil {
+		t.Errorf("Incorrect response keys returned. Failure: %v", err)
+	}
 }
 
 func TestHandleGet(t *testing.T) {
 	target := "http://test.com/get?something=else"
 	headers := map[string][]string{"Accept": []string{"*/*"}}
-	jsonParsed, err := makeRequest(emptyServer.handleGet(), target, "GET", headers)
-	if err != nil {
-		t.Errorf("Failed to make and parse request. Err: %v", err)
+	req := newTestRequest(emptyServer.handleGet(), target, "GET", testReqHeaders(headers))
+	if err := req.make(); err != nil {
+		t.Errorf("Failed to make request. Err: %v", err)
 	}
 
-	fmt.Println("here in GET")
-	fmt.Printf("%#v\n", jsonParsed)
-
-	testCases := []struct {
-		jsonPath string
-		expected string
-	}{
+	testCases := jsonAssertion{
 		{"args.something", "else"},
 		{"headers.Accept", "*/*"},
 		{"url", target},
 	}
 
-	for _, tc := range testCases {
-		if val := jsonParsed.Path(tc.jsonPath).String(); val != tc.expected {
-			t.Errorf("Incorrect val after unmarshal; expected: %v, got: %v", tc.expected, val)
-		}
+	if err := req.validateStatusCode(); err != nil {
+		t.Errorf("Failed request base validations. Failure: %v", err)
 	}
-
-	validateCorrectFields(t, []string{"args", "headers", "origin", "url"}, jsonParsed)
+	if err := req.runTestCases(testCases); err != nil {
+		t.Errorf("Failed test case. Failure: %v", err)
+	}
+	expectedResponseKeys := []string{"args", "headers", "origin", "url"}
+	if err := req.validateCorrectFields(expectedResponseKeys); err != nil {
+		t.Errorf("Incorrect response keys returned. Failure: %v", err)
+	}
 }
 
 func TestHandlePatch(t *testing.T) {
 	target := "http://test.com/patch?something=patched"
 	headers := map[string][]string{"Accept": []string{"*/*"}}
-	jsonParsed, err := makeRequest(emptyServer.handlePatch(), target, "PATCH", headers)
-	if err != nil {
-		t.Errorf("Failed to make and parse request. Err: %v", err)
+	req := newTestRequest(emptyServer.handlePatch(), target, "PATCH", testReqHeaders(headers))
+	if err := req.make(); err != nil {
+		t.Errorf("Failed to make request. Err: %v", err)
 	}
 
-	testCases := []struct {
-		jsonPath string
-		expected string
-	}{
+	testCases := jsonAssertion{
 		{"args.something", "patched"},
 		{"headers.Accept", "*/*"},
 		{"url", target},
 	}
 
-	for _, tc := range testCases {
-		if val := jsonParsed.Path(tc.jsonPath).String(); val != tc.expected {
-			t.Errorf("Incorrect val after unmarshal; expected: %v, got: %v", tc.expected, val)
-		}
+	if err := req.validateStatusCode(); err != nil {
+		t.Errorf("Failed request base validations. Failure: %v", err)
 	}
-
-	validateCorrectFields(t, []string{"args", "data", "files", "form", "headers", "json", "origin", "url"}, jsonParsed)
+	if err := req.runTestCases(testCases); err != nil {
+		t.Errorf("Failed test case. Failure: %v", err)
+	}
+	expectedResponseKeys := []string{"args", "data", "files", "form", "headers", "json", "origin", "url"}
+	if err := req.validateCorrectFields(expectedResponseKeys); err != nil {
+		t.Errorf("Incorrect response keys returned. Failure: %v", err)
+	}
 }
 
 func TestHandlePut(t *testing.T) {
 	target := "http://test.com/put?something=put"
 	headers := map[string][]string{"Accept": []string{"*/*"}}
-	jsonParsed, err := makeRequest(emptyServer.handlePut(), target, "PUT", headers)
-	if err != nil {
-		t.Errorf("Failed to make and parse request. Err: %v", err)
+	req := newTestRequest(emptyServer.handlePut(), target, "PUT", testReqHeaders(headers))
+	if err := req.make(); err != nil {
+		t.Errorf("Failed to make request. Err: %v", err)
 	}
 
-	testCases := []struct {
-		jsonPath string
-		expected string
-	}{
+	testCases := jsonAssertion{
 		{"args.something", "put"},
 		{"headers.Accept", "*/*"},
 		{"url", target},
 	}
 
-	for _, tc := range testCases {
-		if val := jsonParsed.Path(tc.jsonPath).String(); val != tc.expected {
-			t.Errorf("Incorrect val after unmarshal; expected: %v, got: %v", tc.expected, val)
-		}
+	if err := req.validateStatusCode(); err != nil {
+		t.Errorf("Failed request base validations. Failure: %v", err)
 	}
-
-	validateCorrectFields(t, []string{"args", "data", "files", "form", "headers", "json", "origin", "url"}, jsonParsed)
+	if err := req.runTestCases(testCases); err != nil {
+		t.Errorf("Failed test case. Failure: %v", err)
+	}
+	expectedResponseKeys := []string{"args", "data", "files", "form", "headers", "json", "origin", "url"}
+	if err := req.validateCorrectFields(expectedResponseKeys); err != nil {
+		t.Errorf("Incorrect response keys returned. Failure: %v", err)
+	}
 }
 
 func TestHandlePost(t *testing.T) {
 	target := "http://test.com/post?something=post"
 	headers := map[string][]string{"Accept": []string{"*/*"}}
-	jsonParsed, err := makeRequest(emptyServer.handlePost(), target, "POST", headers)
-	if err != nil {
-		t.Errorf("Failed to make and parse request. Err: %v", err)
+	req := newTestRequest(emptyServer.handlePost(), target, "POST", testReqHeaders(headers))
+	if err := req.make(); err != nil {
+		t.Errorf("Failed to make request. Err: %v", err)
 	}
 
-	testCases := []struct {
-		jsonPath string
-		expected string
-	}{
+	testCases := jsonAssertion{
 		{"args.something", "post"},
 		{"headers.Accept", "*/*"},
 		{"url", target},
 	}
 
-	for _, tc := range testCases {
-		if val := jsonParsed.Path(tc.jsonPath).String(); val != tc.expected {
-			t.Errorf("Incorrect val after unmarshal; expected: %v, got: %v", tc.expected, val)
-		}
+	if err := req.validateStatusCode(); err != nil {
+		t.Errorf("Failed request base validations. Failure: %v", err)
 	}
-
-	validateCorrectFields(t, []string{"args", "data", "files", "form", "headers", "json", "origin", "url"}, jsonParsed)
+	if err := req.runTestCases(testCases); err != nil {
+		t.Errorf("Failed test case. Failure: %v", err)
+	}
+	expectedResponseKeys := []string{"args", "data", "files", "form", "headers", "json", "origin", "url"}
+	if err := req.validateCorrectFields(expectedResponseKeys); err != nil {
+		t.Errorf("Incorrect response keys returned. Failure: %v", err)
+	}
 }
 
 func TestHandleAnything(t *testing.T) {
 	target := "http://test.com/anything/test?something=post"
 	headers := map[string][]string{"Accept": []string{"*/*"}}
-	jsonParsed, err := makeRequest(emptyServer.handleAnything(), target, "POST", headers)
-	if err != nil {
-		t.Errorf("Failed to make and parse request. Err: %v", err)
+	req := newTestRequest(emptyServer.handleAnything(), target, "POST", testReqHeaders(headers))
+	if err := req.make(); err != nil {
+		t.Errorf("Failed to make request. Err: %v", err)
 	}
 
-	testCases := []struct {
-		jsonPath string
-		expected string
-	}{
+	testCases := jsonAssertion{
 		{"args.something", "post"},
 		{"headers.Accept", "*/*"},
 		{"url", target},
 		{"method", "POST"},
 	}
 
-	for _, tc := range testCases {
-		if val := jsonParsed.Path(tc.jsonPath).String(); val != tc.expected {
-			t.Errorf("Incorrect val after unmarshal; expected: %v, got: %v", tc.expected, val)
-		}
+	if err := req.validateStatusCode(); err != nil {
+		t.Errorf("Failed request base validations. Failure: %v", err)
 	}
-
-	validateCorrectFields(t, []string{"args", "data", "files", "form", "headers", "json", "method", "origin", "url"}, jsonParsed)
+	if err := req.runTestCases(testCases); err != nil {
+		t.Errorf("Failed test case. Failure: %v", err)
+	}
+	expectedResponseKeys := []string{"args", "data", "files", "form", "headers", "json", "method", "origin", "url"}
+	if err := req.validateCorrectFields(expectedResponseKeys); err != nil {
+		t.Errorf("Incorrect response keys returned. Failure: %v", err)
+	}
 }
 
-func makeRequest(handlerFunc http.HandlerFunc, target, method string, headers map[string][]string) (*jsonparser.Container, error) {
-	req, err := http.NewRequest(method, target, nil)
-	if err != nil {
-		return nil, err
+func TestHandleStatusCodes(t *testing.T) {
+	codeOpts := []int{200, 201, 500}
+	codeOptsString := strings.Trim(strings.Join(strings.Fields(fmt.Sprint(codeOpts)), ","), "[]")
+	target := fmt.Sprintf("http://test.com/status/%s", codeOptsString)
+
+	req := newTestRequest(emptyServer.handleStatusCodes(), target, "GET", testReqStatus(codeOpts))
+
+	req.baseRequest = mux.SetURLVars(req.baseRequest, map[string]string{"codes": codeOptsString})
+
+	if err := req.make(); err != nil {
+		t.Errorf("Failed to make request. Err: %v", err)
 	}
-	req.Header = headers
+
+	if err := req.validateStatusCode(); err != nil {
+		t.Errorf("Failed request base validations. Failure: %v", err)
+	}
+
+	if req.rawJSON != nil {
+		t.Errorf("Response body should be empty, got: %v", string(req.rawJSON))
+	}
+}
+
+type testRequest struct {
+	baseRequest *http.Request
+
+	// inputs
+	handlerFunc http.HandlerFunc
+	target      string
+	method      string
+	headers     map[string][]string
+	status      []int // with multiple status codes a random status is returned
+
+	// output
+	rawJSON    []byte
+	parsedJSON *jsonparser.Container
+	response   *httptest.ResponseRecorder
+}
+
+func testReqMethod(method string) func(*testRequest) {
+	return func(tr *testRequest) {
+		tr.method = method
+	}
+}
+
+func testReqHeaders(headers map[string][]string) func(*testRequest) {
+	return func(tr *testRequest) {
+		tr.headers = headers
+	}
+}
+
+func testReqStatus(codes []int) func(*testRequest) {
+	return func(tr *testRequest) {
+		tr.status = codes
+	}
+}
+
+func newTestRequest(handlerFunc http.HandlerFunc, target, method string, opts ...func(*testRequest)) *testRequest {
+	tr := &testRequest{
+		handlerFunc: handlerFunc,
+		target:      target,
+		method:      method,
+		headers:     make(map[string][]string),
+		status:      []int{http.StatusOK},
+	}
+
+	for _, opt := range opts {
+		opt(tr)
+	}
+
+	req, _ := http.NewRequest(tr.method, tr.target, nil)
+	tr.baseRequest = req
+
+	return tr
+}
+
+func (tr *testRequest) make() error {
+	tr.baseRequest.Header = tr.headers
 
 	rr := httptest.NewRecorder()
 
-	handlerFunc.ServeHTTP(rr, req)
+	tr.handlerFunc.ServeHTTP(rr, tr.baseRequest)
 
-	if status := rr.Code; status != http.StatusOK {
-		return nil, fmt.Errorf("Status code differs. Expected %d .\n Got %d instead", http.StatusOK, status)
+	tr.response = rr
+
+	tr.rawJSON = rr.Body.Bytes()
+
+	if rr.Body.Bytes() != nil {
+		jsonParsed, err := jsonparser.ParseJSON(rr.Body.Bytes())
+		if err != nil {
+			return fmt.Errorf("Unable to parse returned JSON. Err: %v", err)
+		}
+		tr.parsedJSON = jsonParsed
 	}
 
-	jsonParsed, err := jsonparser.ParseJSON(rr.Body.Bytes())
-	if err != nil {
-		return nil, fmt.Errorf("Unable to parse returned JSON. Err: %v", err)
-	}
-
-	return jsonParsed, nil
+	return nil
 }
 
-func validateCorrectFields(t *testing.T, expected []string, json *jsonparser.Container) {
+func (tr *testRequest) validateStatusCode() error {
+	// status in provided statuses
+	var validStatus = false
+	for _, code := range tr.status {
+		if code == tr.response.Code {
+			validStatus = true
+		}
+	}
+	if !validStatus {
+		return fmt.Errorf("Status code differs. Expected code to be one of %v, got %d", tr.status, tr.response.Code)
+	}
+
+	return nil
+}
+
+func (tr *testRequest) runTestCases(testCases jsonAssertion) error {
+	for _, tc := range testCases {
+		if val := tr.parsedJSON.Path(tc.jsonPath).String(); val != tc.expected {
+			return fmt.Errorf("Incorrect val after unmarshal; expected: %v, got: %v", tc.expected, val)
+		}
+	}
+	return nil
+}
+
+func (tr *testRequest) validateCorrectFields(expected []string) error {
 	for _, field := range expected {
-		if val := json.Path(field).Data(); val == nil {
-			t.Errorf("Expected field %s to be included in response", field)
+		if val := tr.parsedJSON.Path(field).Data(); val == nil {
+			return fmt.Errorf("Expected field %s to be included in response", field)
 		}
 	}
 
-	allFields := []string{"args", "data", "files", "form", "headers", "json", "method", "origin", "url"}
-	expectedNotIncluced := sliceDiff(allFields, expected)
+	expectedNotIncluced := sliceDiff(possibleResponseFields, expected)
 
 	for _, field := range expectedNotIncluced {
-		if val := json.Path(field).Data(); val != nil {
-			fmt.Printf("%#v\n", val)
-			t.Errorf("%s should not be included in response, got: %s", field, json.Path(field).String())
+		if val := tr.parsedJSON.Path(field).Data(); val != nil {
+			return fmt.Errorf("%s should not be included in response, got: %s", field, tr.parsedJSON.Path(field).String())
 		}
 	}
-
+	return nil
 }
 
 func sliceDiff(slice1 []string, slice2 []string) []string {
@@ -233,6 +334,5 @@ func sliceDiff(slice1 []string, slice2 []string) []string {
 			slice1, slice2 = slice2, slice1
 		}
 	}
-
 	return diff
 }

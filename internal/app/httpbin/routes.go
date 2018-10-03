@@ -11,4 +11,7 @@ func (s *Server) initRoutes() {
 	// Anything Methods
 	s.router.HandleFunc("/anything", s.handleAnything())
 	s.router.HandleFunc("/anything/{anything}", s.handleAnything())
+
+	// Status Codes Methods
+	s.router.HandleFunc("/status/{codes}", s.handleStatusCodes())
 }
