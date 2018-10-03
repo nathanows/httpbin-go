@@ -10,15 +10,16 @@ import (
 
 // Request represents http request metadata
 type Request struct {
-	Args    map[string]string `json:"args"`
-	Data    string            `json:"data"`
-	Files   map[string]string `json:"files"`
-	Form    map[string]string `json:"form"`
-	Headers map[string]string `json:"headers"`
-	JSON    string            `json:"json"`
-	Origin  string            `json:"origin"`
-	URL     string            `json:"url"`
-	Method  string            `json:"method"`
+	Args      map[string]string `json:"args"`
+	Data      string            `json:"data"`
+	Files     map[string]string `json:"files"`
+	Form      map[string]string `json:"form"`
+	Headers   map[string]string `json:"headers"`
+	JSON      string            `json:"json"`
+	Origin    string            `json:"origin"`
+	URL       string            `json:"url"`
+	Method    string            `json:"method"`
+	UserAgent string            `json:"user-agent"`
 }
 
 type requestKeys []string
@@ -43,15 +44,16 @@ func RequestToJSON(r *http.Request, keys requestKeys) ([]byte, error) {
 
 func parseRequest(r *http.Request) (*Request, error) {
 	return &Request{
-		Args:    getArgs(r),
-		Data:    "",
-		Files:   make(map[string]string),
-		Form:    make(map[string]string),
-		Headers: getHeaders(r),
-		JSON:    "",
-		Method:  getMethod(r),
-		Origin:  getOrigin(r),
-		URL:     getURL(r),
+		Args:      getArgs(r),
+		Data:      "",
+		Files:     make(map[string]string),
+		Form:      make(map[string]string),
+		Headers:   getHeaders(r),
+		JSON:      "",
+		Method:    getMethod(r),
+		Origin:    getOrigin(r),
+		URL:       getURL(r),
+		UserAgent: getUserAgent(r),
 	}, nil
 }
 
@@ -108,6 +110,10 @@ func getArgs(r *http.Request) map[string]string {
 
 func getMethod(r *http.Request) string {
 	return r.Method
+}
+
+func getUserAgent(r *http.Request) string {
+	return r.Header.Get("User-Agent")
 }
 
 func keySet(keys requestKeys) map[string]bool {

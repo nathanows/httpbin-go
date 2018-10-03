@@ -14,4 +14,9 @@ func (s *Server) initRoutes() {
 
 	// Status Codes Methods
 	s.router.HandleFunc("/status/{codes}", s.handleStatusCodes())
+
+	// Request Inspection Methods
+	s.router.HandleFunc("/headers", s.handleHeaders()).Methods("GET")
+	s.router.HandleFunc("/ip", s.handleIP()).Methods("GET")
+	s.router.HandleFunc("/user-agent", s.handleUserAgent()).Methods("GET")
 }
