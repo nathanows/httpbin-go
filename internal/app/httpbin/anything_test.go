@@ -2,7 +2,7 @@ package httpbin
 
 import "testing"
 
-func TestHandleAnything(t *testing.T) {
+func TestAnything(t *testing.T) {
 	target := "http://test.com/anything/test?something=post"
 	headers := map[string][]string{"Accept": []string{"*/*"}}
 	req := newTestRequest(emptyServer.handleAnything(), target, "POST", testReqHeaders(headers))
