@@ -2,10 +2,12 @@ package httpbin
 
 import "testing"
 
+var httpServer = &Server{}
+
 func TestHandleDelete(t *testing.T) {
 	target := "http://test.com/delete?something=good"
 	headers := map[string][]string{"Accept": []string{"*/*"}}
-	req := newTestRequest(emptyServer.handleDelete(), target, "DELETE", testReqHeaders(headers))
+	req := newTestRequest(httpServer.handleDelete(), target, "DELETE", testReqHeaders(headers))
 	if err := req.make(); err != nil {
 		t.Errorf("Failed to make request. Err: %v", err)
 	}
@@ -31,7 +33,7 @@ func TestHandleDelete(t *testing.T) {
 func TestHandleGet(t *testing.T) {
 	target := "http://test.com/get?something=else"
 	headers := map[string][]string{"Accept": []string{"*/*"}}
-	req := newTestRequest(emptyServer.handleGet(), target, "GET", testReqHeaders(headers))
+	req := newTestRequest(httpServer.handleGet(), target, "GET", testReqHeaders(headers))
 	if err := req.make(); err != nil {
 		t.Errorf("Failed to make request. Err: %v", err)
 	}
@@ -57,7 +59,7 @@ func TestHandleGet(t *testing.T) {
 func TestHandlePatch(t *testing.T) {
 	target := "http://test.com/patch?something=patched"
 	headers := map[string][]string{"Accept": []string{"*/*"}}
-	req := newTestRequest(emptyServer.handlePatch(), target, "PATCH", testReqHeaders(headers))
+	req := newTestRequest(httpServer.handlePatch(), target, "PATCH", testReqHeaders(headers))
 	if err := req.make(); err != nil {
 		t.Errorf("Failed to make request. Err: %v", err)
 	}
@@ -83,7 +85,7 @@ func TestHandlePatch(t *testing.T) {
 func TestHandlePut(t *testing.T) {
 	target := "http://test.com/put?something=put"
 	headers := map[string][]string{"Accept": []string{"*/*"}}
-	req := newTestRequest(emptyServer.handlePut(), target, "PUT", testReqHeaders(headers))
+	req := newTestRequest(httpServer.handlePut(), target, "PUT", testReqHeaders(headers))
 	if err := req.make(); err != nil {
 		t.Errorf("Failed to make request. Err: %v", err)
 	}
@@ -109,7 +111,7 @@ func TestHandlePut(t *testing.T) {
 func TestHandlePost(t *testing.T) {
 	target := "http://test.com/post?something=post"
 	headers := map[string][]string{"Accept": []string{"*/*"}}
-	req := newTestRequest(emptyServer.handlePost(), target, "POST", testReqHeaders(headers))
+	req := newTestRequest(httpServer.handlePost(), target, "POST", testReqHeaders(headers))
 	if err := req.make(); err != nil {
 		t.Errorf("Failed to make request. Err: %v", err)
 	}

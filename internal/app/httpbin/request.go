@@ -24,6 +24,17 @@ type Request struct {
 
 type requestKeys []string
 
+func returnRequestAsJSON(w http.ResponseWriter, r *http.Request, keys requestKeys) {
+	json, err := RequestToJSON(r, keys)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(json)
+}
+
 // RequestToJSON parses an incoming http request and returns a bytes.Buffer
 // containing a properly indented, JSON formatted httpbin.Request
 func RequestToJSON(r *http.Request, keys requestKeys) ([]byte, error) {

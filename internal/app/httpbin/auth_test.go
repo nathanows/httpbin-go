@@ -8,6 +8,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
+var authServer = &Server{}
+
 func TestHandleBasicAuth(t *testing.T) {
 	user := "steve"
 	pass := "s3cr3t"
@@ -15,7 +17,7 @@ func TestHandleBasicAuth(t *testing.T) {
 	base64Auth := base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", user, pass)))
 	authHeader := fmt.Sprintf("Basic %s", base64Auth)
 	headers := map[string][]string{"Authorization": []string{authHeader}}
-	req := newTestRequest(emptyServer.handleBasicAuth(), target, "GET", testReqHeaders(headers))
+	req := newTestRequest(authServer.handleBasicAuth(), target, "GET", testReqHeaders(headers))
 	req.baseRequest = mux.SetURLVars(req.baseRequest, map[string]string{"user": user, "password": pass})
 	if err := req.make(); err != nil {
 		t.Errorf("Failed to make request. Err: %v", err)
@@ -46,7 +48,7 @@ func TestHandleBearer(t *testing.T) {
 	target := "http://test.com/basic-auth"
 	authHeader := fmt.Sprintf("Bearer %s", token)
 	headers := map[string][]string{"Authorization": []string{authHeader}}
-	req := newTestRequest(emptyServer.handleBearer(), target, "GET", testReqHeaders(headers))
+	req := newTestRequest(authServer.handleBearer(), target, "GET", testReqHeaders(headers))
 	if err := req.make(); err != nil {
 		t.Errorf("Failed to make request. Err: %v", err)
 	}

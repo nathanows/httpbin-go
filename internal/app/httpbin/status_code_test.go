@@ -8,12 +8,14 @@ import (
 	"github.com/gorilla/mux"
 )
 
+var statusCodeServer = &Server{}
+
 func TestHandleStatusCodes(t *testing.T) {
 	codeOpts := []int{200, 201, 500}
 	codeOptsString := strings.Trim(strings.Join(strings.Fields(fmt.Sprint(codeOpts)), ","), "[]")
 	target := fmt.Sprintf("http://test.com/status/%s", codeOptsString)
 
-	req := newTestRequest(emptyServer.handleStatusCodes(), target, "GET", testReqStatus(codeOpts))
+	req := newTestRequest(statusCodeServer.handleStatusCodes(), target, "GET", testReqStatus(codeOpts))
 
 	req.baseRequest = mux.SetURLVars(req.baseRequest, map[string]string{"codes": codeOptsString})
 
