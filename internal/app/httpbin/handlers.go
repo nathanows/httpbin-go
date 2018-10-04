@@ -135,7 +135,41 @@ func (s *Server) handleBasicAuth() http.HandlerFunc {
 	}
 }
 
+func (s *Server) handleBearer() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var token string
+
+		tokens, ok := r.Header["Authorization"]
+		if ok && len(tokens) >= 1 {
+			token = tokens[0]
+			token = strings.TrimPrefix(token, "Bearer ")
+		}
+
+		if token == "" || token == tokens[0] {
+			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+			return
+		}
+
+		type bearerResponse struct {
+			Authenticated bool   `json:"authenticated"`
+			Token         string `json:"token"`
+		}
+
+		resp := bearerResponse{Authenticated: true, Token: token}
+		jsonResp, err := json.MarshalIndent(resp, "", "  ")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		jsonResp = append(jsonResp, "\n"...)
+
+		w.WriteHeader(http.StatusOK)
+		w.Write(jsonResp)
+	}
+}
+
 func returnRequestAsJSON(w http.ResponseWriter, r *http.Request, keys requestKeys) {
+
 	json, err := RequestToJSON(r, keys)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

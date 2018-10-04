@@ -22,4 +22,5 @@ func (s *Server) initRoutes() {
 
 	// Auth Routes
 	s.router.HandleFunc("/basic-auth/{user}/{password}", s.handleBasicAuth()).Methods("GET")
+	s.router.HandleFunc("/bearer", s.handleBearer()).Methods("GET")
 }
