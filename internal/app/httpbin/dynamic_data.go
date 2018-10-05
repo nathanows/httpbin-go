@@ -2,6 +2,7 @@ package httpbin
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"io"
 	"math"
@@ -11,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 )
 
@@ -236,6 +238,93 @@ func (s *Server) handleRange() http.HandlerFunc {
 			}
 			fw.Write([]byte(string(chunks)))
 		}
+	}
+}
+
+func (s *Server) handleStreamBytes() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		length, err := parseURLFloat(mux.Vars(r)["n"], "")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		length = math.Min(length, 100*1024) // set 100KB limit
+
+		if seed := r.URL.Query().Get("seed"); seed != "" {
+			i, err := strconv.Atoi(seed)
+			if err == nil {
+				rand.Seed(int64(i))
+			}
+		} else {
+			rand.Seed(time.Now().UnixNano())
+		}
+
+		var chunkSize float64
+		if chunkSize, err = parseURLFloat(r.URL.Query().Get("chunk_size"), "10240"); err != nil {
+			http.Error(w, "Invalid chunk_size", http.StatusBadRequest)
+			return
+		}
+
+		fw := flushWriter{w: w}
+		if f, ok := w.(http.Flusher); ok {
+			fw.f = f
+		}
+
+		w.Header().Set("Content-Type", "application/octet-stream")
+
+		var chunks []byte
+		for i := 0; i < int(length); i++ {
+			chunks = append(chunks, strconv.Itoa(rand.Intn(255))...)
+			if len(chunks) == int(chunkSize) {
+				fw.Write(chunks)
+				chunks = []byte{}
+			}
+		}
+
+		if len(chunks) > 0 {
+			fw.Write([]byte(string(chunks)))
+		}
+	}
+}
+
+func (s *Server) handleStream() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		req, err := parseRequest(r)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+
+		keys := requestKeys{"url", "args", "origin", "headers"}
+		requestedKeys := req.selectKeys(keys)
+
+		numResults, err := parseURLFloat(mux.Vars(r)["n"], "")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		numResults = math.Min(numResults, 100) // max 100 results
+
+		w.Header().Set("Content-Type", "application/json")
+
+		enc := json.NewEncoder(w)
+
+		for i := 0; i < int(numResults); i++ {
+			enc.Encode(requestedKeys)
+		}
+	}
+}
+
+func (s *Server) handleUUID() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		result := make(map[string]string, 1)
+		result["uuid"] = uuid.New().String()
+
+		json, err := json.Marshal(result)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		json = append(json, "\n"...)
+
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(json)
 	}
 }
 

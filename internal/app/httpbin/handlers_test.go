@@ -8,7 +8,7 @@ import (
 	"github.com/ndwhtlssthr/httpbin-go/pkg/jsonparser"
 )
 
-var possibleResponseFields = []string{"args", "authenticated", "data", "files", "form", "headers", "json", "method", "origin", "token", "url", "user", "user-agent"}
+var possibleResponseFields = []string{"args", "authenticated", "data", "files", "form", "headers", "json", "method", "origin", "token", "url", "user", "user-agent", "uuid"}
 
 type jsonAssertion []struct {
 	jsonPath string

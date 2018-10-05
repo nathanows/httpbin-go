@@ -46,4 +46,7 @@ func (s *Server) initRoutes() {
 	s.router.HandleFunc("/drip", s.handleDrip())
 	s.router.HandleFunc("/links/{n:[0-9]+}/{offset:[0-9]+}", s.handleLinks()).Methods("GET")
 	s.router.HandleFunc("/range/{numbytes:[0-9]+}", s.handleRange()).Methods("GET")
+	s.router.HandleFunc("/stream-bytes/{n:[0-9]+}", s.handleStreamBytes()).Methods("GET")
+	s.router.HandleFunc("/stream/{n:[0-9]+}", s.handleStream()).Methods("GET")
+	s.router.HandleFunc("/uuid", s.handleUUID()).Methods("GET")
 }
