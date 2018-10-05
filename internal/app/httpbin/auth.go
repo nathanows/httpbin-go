@@ -38,6 +38,7 @@ func (s *Server) handleBasicAuth() http.HandlerFunc {
 		}
 		jsonResp = append(jsonResp, "\n"...)
 
+		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		w.Write(jsonResp)
 	}
@@ -66,6 +67,7 @@ func (s *Server) handleBearer() http.HandlerFunc {
 		}
 		jsonResp = append(jsonResp, "\n"...)
 
+		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		w.Write(jsonResp)
 	}

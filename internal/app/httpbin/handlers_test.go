@@ -31,9 +31,9 @@ type testRequest struct {
 	status      []int // with multiple status codes a random status is returned
 
 	// output
-	rawJSON    []byte
-	parsedJSON *jsonparser.Container
-	response   *httptest.ResponseRecorder
+	rawResponse []byte
+	parsedJSON  *jsonparser.Container
+	response    *httptest.ResponseRecorder
 }
 
 func testReqMethod(method string) func(*testRequest) {
@@ -82,9 +82,9 @@ func (tr *testRequest) make() error {
 
 	tr.response = rr
 
-	tr.rawJSON = rr.Body.Bytes()
+	tr.rawResponse = rr.Body.Bytes()
 
-	if rr.Body.Bytes() != nil {
+	if rr.Body.Bytes() != nil && rr.Header().Get("Content-Type") == "application/json" {
 		jsonParsed, err := jsonparser.ParseJSON(rr.Body.Bytes())
 		if err != nil {
 			return fmt.Errorf("Unable to parse returned JSON. Err: %v", err)

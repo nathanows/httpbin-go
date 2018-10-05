@@ -85,7 +85,6 @@ func (s *Server) handleResponseHeaders() http.HandlerFunc {
 		for k, v := range w.Header() {
 			resp[k] = strings.Join(v, ",")
 		}
-		fmt.Printf("%+v\n", resp)
 
 		json, err := json.Marshal(resp)
 		if err != nil {

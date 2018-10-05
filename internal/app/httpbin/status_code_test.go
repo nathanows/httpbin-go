@@ -27,7 +27,7 @@ func TestHandleStatusCodes(t *testing.T) {
 		t.Errorf("Failed request base validations. Failure: %v", err)
 	}
 
-	if req.rawJSON != nil {
-		t.Errorf("Response body should be empty, got: %v", string(req.rawJSON))
+	if req.rawResponse != nil {
+		t.Errorf("Response body should be empty, got: %v", string(req.rawResponse))
 	}
 }

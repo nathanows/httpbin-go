@@ -30,4 +30,12 @@ func (s *Server) initRoutes() {
 	s.router.HandleFunc("/cache/{value:[0-9]+}", s.handleCacheControl()).Methods("GET")
 	s.router.HandleFunc("/etag/{etag}", s.handleETag()).Methods("GET")
 	s.router.HandleFunc("/response-headers", s.handleResponseHeaders()).Methods("GET", "POST")
+
+	// Response Formats
+	s.router.HandleFunc("/deny", s.handleDeny()).Methods("GET")
+	s.router.HandleFunc("/encoding/utf8", s.handleEncodingUTF8()).Methods("GET")
+	s.router.HandleFunc("/html", s.handleHTML()).Methods("GET")
+	s.router.HandleFunc("/json", s.handleJSON()).Methods("GET")
+	s.router.HandleFunc("/robots.txt", s.handleRobotsTxt()).Methods("GET")
+	s.router.HandleFunc("/xml", s.handleXML()).Methods("GET")
 }
