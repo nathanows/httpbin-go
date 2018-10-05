@@ -44,4 +44,6 @@ func (s *Server) initRoutes() {
 	s.router.HandleFunc("/bytes/{n:[0-9]+}", s.handleBytes()).Methods("GET")
 	s.router.HandleFunc("/delay/{delay:[0-9]+}", s.handleDelay())
 	s.router.HandleFunc("/drip", s.handleDrip())
+	s.router.HandleFunc("/links/{n:[0-9]+}/{offset:[0-9]+}", s.handleLinks()).Methods("GET")
+	s.router.HandleFunc("/range/{numbytes:[0-9]+}", s.handleRange()).Methods("GET")
 }
