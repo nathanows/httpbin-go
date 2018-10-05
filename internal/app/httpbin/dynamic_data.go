@@ -104,9 +104,14 @@ func (s *Server) handleDrip() http.HandlerFunc {
 		}
 		w.WriteHeader(respCode)
 
+		fw := flushWriter{w: w}
+		if f, ok := w.(http.Flusher); ok {
+			fw.f = f
+		}
+
 		pause := duration / numbytes
 		for i := 1; i <= int(numbytes); i++ {
-			w.Write([]byte("*"))
+			fw.Write([]byte("*"))
 			if err := delayRequest(pause); err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
