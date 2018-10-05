@@ -24,4 +24,10 @@ func (s *Server) initRoutes() {
 	s.router.HandleFunc("/basic-auth/{user}/{password}", s.handleBasicAuth()).Methods("GET")
 	s.router.HandleFunc("/bearer", s.handleBearer()).Methods("GET")
 	s.router.HandleFunc("/hidden-basic-auth/{user}/{password}", s.handleBasicAuth()).Methods("GET")
+
+	// Response Inspection Routes
+	s.router.HandleFunc("/cache", s.handleCache()).Methods("GET")
+	s.router.HandleFunc("/cache/{value:[0-9]+}", s.handleCacheControl()).Methods("GET")
+	s.router.HandleFunc("/etag/{etag}", s.handleETag()).Methods("GET")
+	s.router.HandleFunc("/response-headers", s.handleResponseHeaders()).Methods("GET", "POST")
 }
