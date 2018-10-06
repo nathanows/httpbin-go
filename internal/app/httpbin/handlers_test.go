@@ -8,7 +8,7 @@ import (
 	"github.com/ndwhtlssthr/httpbin-go/pkg/jsonparser"
 )
 
-var possibleResponseFields = []string{"args", "authenticated", "data", "files", "form", "headers", "json", "method", "origin", "token", "url", "user", "user-agent", "uuid"}
+var possibleResponseFields = []string{"args", "authenticated", "cookies", "data", "files", "form", "headers", "json", "method", "origin", "token", "url", "user", "user-agent", "uuid"}
 
 type jsonAssertion []struct {
 	jsonPath string
@@ -74,7 +74,9 @@ func newTestRequest(handlerFunc http.HandlerFunc, target, method string, opts ..
 }
 
 func (tr *testRequest) make() error {
-	tr.baseRequest.Header = tr.headers
+	if len(tr.headers) > 0 {
+		tr.baseRequest.Header = tr.headers
+	}
 
 	rr := httptest.NewRecorder()
 

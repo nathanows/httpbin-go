@@ -49,4 +49,10 @@ func (s *Server) initRoutes() {
 	s.router.HandleFunc("/stream-bytes/{n:[0-9]+}", s.handleStreamBytes()).Methods("GET")
 	s.router.HandleFunc("/stream/{n:[0-9]+}", s.handleStream()).Methods("GET")
 	s.router.HandleFunc("/uuid", s.handleUUID()).Methods("GET")
+
+	// Cookies
+	s.router.HandleFunc("/cookies", s.handleCookies()).Methods("GET")
+	s.router.HandleFunc("/cookies/delete", s.handleCookiesDelete()).Methods("GET")
+	s.router.HandleFunc("/cookies/set", s.handleCookiesSet()).Methods("GET")
+	s.router.HandleFunc("/cookies/set/{name}/{value}", s.handleCookiesSet()).Methods("GET")
 }
