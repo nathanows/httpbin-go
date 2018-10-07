@@ -55,7 +55,6 @@ func (s *Server) handleCookiesDelete() http.HandlerFunc {
 				c := http.Cookie{
 					Name:    cookie.Name,
 					Path:    "/",
-					Value:   "asdf",
 					Expires: time.Now().Add(-100 * time.Hour),
 					MaxAge:  -1,
 				}
