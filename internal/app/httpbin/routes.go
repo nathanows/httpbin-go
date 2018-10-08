@@ -62,4 +62,7 @@ func (s *Server) initRoutes() {
 	s.router.HandleFunc("/image/png", s.handleImage("image/png")).Methods("GET")
 	s.router.HandleFunc("/image/svg", s.handleImage("image/svg+xml")).Methods("GET")
 	s.router.HandleFunc("/image/webp", s.handleImage("image/webp")).Methods("GET")
+
+	// Redirects
+	s.router.HandleFunc("/redirect-to", s.handleRedirectTo())
 }
