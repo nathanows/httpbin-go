@@ -55,4 +55,11 @@ func (s *Server) initRoutes() {
 	s.router.HandleFunc("/cookies/delete", s.handleCookiesDelete()).Methods("GET")
 	s.router.HandleFunc("/cookies/set", s.handleCookiesSet()).Methods("GET")
 	s.router.HandleFunc("/cookies/set/{name}/{value}", s.handleCookiesSet()).Methods("GET")
+
+	// Images
+	s.router.HandleFunc("/image", s.handleImage("")).Methods("GET")
+	s.router.HandleFunc("/image/jpeg", s.handleImage("image/jpeg")).Methods("GET")
+	s.router.HandleFunc("/image/png", s.handleImage("image/png")).Methods("GET")
+	s.router.HandleFunc("/image/svg", s.handleImage("image/svg+xml")).Methods("GET")
+	s.router.HandleFunc("/image/webp", s.handleImage("image/webp")).Methods("GET")
 }
