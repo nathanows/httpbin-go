@@ -11,11 +11,11 @@ docker pull ndwhtlssthr/httpbin-go
 ```
 # Endpoints Implemented
 ### HTTP
-- [x] /delete [DELETE]
-- [x] /get [GET]
-- [x] /patch [PATCH]
-- [x] /post [POST]
-- [x] /put [PUT]
+- [x] `/delete` [DELETE]
+- [x] `/get` [GET]
+- [x] `/patch` [PATCH]
+- [x] `/post` [POST]
+- [x] `/put` [PUT]
 
 ### Auth
 - [x] /basic-auth/{user}/{passwd} [GET]
