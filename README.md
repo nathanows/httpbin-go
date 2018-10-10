@@ -20,6 +20,11 @@ go build cmd/httpbin/main.go -o httpbin-go
 go run httpbin-go
 ```
 
+### Hosted Service
+```
+curl -v http://httpbin-go.com/get
+```
+
 ## Sample Use Cases
 
 _TODO_ 
@@ -124,3 +129,5 @@ _TODO_
 
 # Features
 
+- [ ] Replicate all existing `httpbin` endpoints
+- [ ] Host public service at `www.httpbin-go.com`
