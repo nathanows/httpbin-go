@@ -14,6 +14,21 @@ The original httpbin Docker container tips the scales at ~500MB, httpbin-go is *
 docker pull ndwhtlssthr/httpbin-go
 ```
 # Endpoints Implemented
+Where possible, endpoint have been implemented to match the original implementation (specified here: https://httpbin.org/).
+
+The following endpoints have not yet been implemented in this project:
+
+- [ ] `/digest-auth/{qop}/{user}/{passwd}` [GET]
+- [ ] `/digest-auth/{qop}/{user}/{passwd}/{algorithm}` [GET]
+- [ ] `/digest-auth/{qop}/{user}/{passwd}/{algorithm}/{stale_after}` [GET]
+- [ ] `/brotli` [GET]
+- [ ] `/deflate` [GET]
+- [ ] `/gzip` [GET]
+- [ ] `/absolute-redirect/{n}` [GET]
+- [ ] `/redirect-to/{n}` [GET]
+- [ ] `/relative-redirect/{n}` [GET]
+
+<details><summary>View Implementation Status of All Endpoints</summary>
 ### HTTP
 - [x] `/delete` [DELETE]
 - [x] `/get` [GET]
@@ -87,3 +102,4 @@ docker pull ndwhtlssthr/httpbin-go
 ### Anything
 - [x] `/anything` [DELETE, GET, PATCH, POST, PUT]
 - [x] `/anything/{anything}` [DELETE, GET, PATCH, POST, PUT]
+</details>
