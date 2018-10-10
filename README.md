@@ -1,6 +1,6 @@
 # httpbin-go: HTTP Request & Response Service
 
-[![Build Status](https://travis-ci.org/ndwhtlssthr/httpbin-go.svg?branch=master)](https://travis-ci.org/ndwhtlssthr/httpbin-go) [![codecov](https://codecov.io/gh/ndwhtlssthr/httpbin-go/branch/master/graph/badge.svg)](https://codecov.io/gh/ndwhtlssthr/httpbin-go) [![Docker Pulls](https://img.shields.io/docker/pulls/nowsiany/httpbin-go.svg)](https://hub.docker.com/r/nowsiany/httpbin-go/) ![GitHub](https://img.shields.io/github/license/ndwhtlssthr/httpbin-go.svg)
+![GitHub](https://img.shields.io/github/license/ndwhtlssthr/httpbin-go.svg) [![Build Status](https://travis-ci.org/ndwhtlssthr/httpbin-go.svg?branch=master)](https://travis-ci.org/ndwhtlssthr/httpbin-go) [![codecov](https://codecov.io/gh/ndwhtlssthr/httpbin-go/branch/master/graph/badge.svg)](https://codecov.io/gh/ndwhtlssthr/httpbin-go) [![Docker Pulls](https://img.shields.io/docker/pulls/nowsiany/httpbin-go.svg)](https://hub.docker.com/r/nowsiany/httpbin-go/)
 
 
 
