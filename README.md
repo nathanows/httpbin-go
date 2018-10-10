@@ -131,3 +131,5 @@ _TODO_
 
 - [ ] Replicate all existing `httpbin` endpoints
 - [ ] Host public service at `www.httpbin-go.com`
+- [ ] Add TLS support
+- [ ] Add swagger docs
