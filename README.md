@@ -1,6 +1,7 @@
 # httpbin-go: HTTP Request & Response Service
 
-[![Build Status](https://travis-ci.org/ndwhtlssthr/httpbin-go.svg?branch=master)](https://travis-ci.org/ndwhtlssthr/httpbin-go) [![codecov](https://codecov.io/gh/ndwhtlssthr/httpbin-go/branch/master/graph/badge.svg)](https://codecov.io/gh/ndwhtlssthr/httpbin-go) [![Docker Pulls](https://img.shields.io/docker/pulls/nowsiany/httpbin-go.svg)](https://hub.docker.com/r/nowsiany/httpbin-go/)
+[![Build Status](https://travis-ci.org/ndwhtlssthr/httpbin-go.svg?branch=master)](https://travis-ci.org/ndwhtlssthr/httpbin-go) [![codecov](https://codecov.io/gh/ndwhtlssthr/httpbin-go/branch/master/graph/badge.svg)](https://codecov.io/gh/ndwhtlssthr/httpbin-go) [![Docker Pulls](https://img.shields.io/docker/pulls/nowsiany/httpbin-go.svg)](https://hub.docker.com/r/nowsiany/httpbin-go/) ![GitHub](https://img.shields.io/github/license/ndwhtlssthr/httpbin-go.svg)
+
 
 
 httpbin-go is a Go port of the popular [requests/httpbin](https://github.com/requests/httpbin), and its corresponding Docker image [kennethreitz/httpbin](https://hub.docker.com/r/kennethreitz/httpbin/).
@@ -11,7 +12,7 @@ The original httpbin Docker container tips the scales at ~500MB, httpbin-go is *
 
 ### Docker Container
 ```
-docker pull ndwhtlssthr/httpbin-go
+docker pull nowsiany/httpbin-go
 ```
 # Endpoints Implemented
 Where possible, endpoint have been implemented to match the original implementation (specified here: https://httpbin.org/).
@@ -28,7 +29,8 @@ The following endpoints have not yet been implemented in this project:
 - [ ] `/redirect-to/{n}` [GET]
 - [ ] `/relative-redirect/{n}` [GET]
 
-<details><summary>View Implementation Status of All Endpoints</summary>
+<details><summary><b>View Implementation Status of All Endpoints<b></summary>
+  
 ### HTTP
 - [x] `/delete` [DELETE]
 - [x] `/get` [GET]
@@ -103,3 +105,5 @@ The following endpoints have not yet been implemented in this project:
 - [x] `/anything` [DELETE, GET, PATCH, POST, PUT]
 - [x] `/anything/{anything}` [DELETE, GET, PATCH, POST, PUT]
 </details>
+
+# Performance Comparison
