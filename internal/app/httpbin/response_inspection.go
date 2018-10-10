@@ -21,7 +21,7 @@ func (s *Server) handleCache() http.HandlerFunc {
 		lastMod := time.Now().Format("Mon, 04 Oct 2018 23:08:16 GMT")
 		w.Header().Set("Last-Modified", lastMod)
 
-		uuid, _ := uuid.NewV4()
+		uuid := uuid.NewV4()
 		w.Header().Set("ETag", uuid.String())
 
 		keys := requestKeys{"args", "headers", "origin", "url"}
