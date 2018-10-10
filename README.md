@@ -130,6 +130,7 @@ _TODO_
 # Features
 
 - [ ] Replicate all existing `httpbin` endpoints
+- [ ] Performance benchmarking
 - [ ] Host public service at `www.httpbin-go.com`
 - [ ] Add TLS support
 - [ ] Add swagger docs
