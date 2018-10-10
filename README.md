@@ -29,7 +29,7 @@ The following endpoints have not yet been implemented in this project:
 - [ ] `/redirect-to/{n}` [GET]
 - [ ] `/relative-redirect/{n}` [GET]
 
-<details><summary><b>View Implementation Status of All Endpoints<b></summary>
+<details><summary><b>View Implementation Status of All Endpoints</b></summary>
   
 ### HTTP
 - [x] `/delete` [DELETE]
