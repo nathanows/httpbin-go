@@ -2,18 +2,28 @@
 
 ![GitHub](https://img.shields.io/github/license/ndwhtlssthr/httpbin-go.svg) [![Build Status](https://travis-ci.org/ndwhtlssthr/httpbin-go.svg?branch=master)](https://travis-ci.org/ndwhtlssthr/httpbin-go) [![codecov](https://codecov.io/gh/ndwhtlssthr/httpbin-go/branch/master/graph/badge.svg)](https://codecov.io/gh/ndwhtlssthr/httpbin-go) [![Docker Pulls](https://img.shields.io/docker/pulls/nowsiany/httpbin-go.svg)](https://hub.docker.com/r/nowsiany/httpbin-go/)
 
-
-
 httpbin-go is a Go port of the popular [requests/httpbin](https://github.com/requests/httpbin), and its corresponding Docker image [kennethreitz/httpbin](https://hub.docker.com/r/kennethreitz/httpbin/).
 
 The original httpbin Docker container tips the scales at ~500MB, httpbin-go is **>80x smaller** (~6MB) and **10x faster** (see performance comparison below).
 
-### Build and Run Locally
+# Usage
+`httpbin-go` is an HTTP Request & Response Service, written in Go. Like the original `httpbin`, `httpbin-go` is an HTTP server that responds in predictable ways to a specified set of HTTP requests. For many endpoints the service echoes back much of the data given to it so that a developer can see what their HTTP client code is doing.
 
-### Docker Container
+### Docker
 ```
-docker pull nowsiany/httpbin-go
+docker run -p 8080:8080 nowsiany/httpbin-go
 ```
+
+### Build and Run Locally
+```
+go build cmd/httpbin/main.go -o httpbin-go
+go run httpbin-go
+```
+
+## Sample Use Cases
+
+_TODO_ 
+
 # Endpoints Implemented
 Where possible, endpoint have been implemented to match the original implementation (specified here: https://httpbin.org/).
 
@@ -109,3 +119,8 @@ Click below to see the current implementation status of all endpoints:
 </details>
 
 # Performance Comparison
+
+_TODO_
+
+# Features
+
