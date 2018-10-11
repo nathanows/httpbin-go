@@ -38,6 +38,7 @@ func (s *Server) initRoutes() {
 	s.router.HandleFunc("/json", s.handleJSON()).Methods("GET")
 	s.router.HandleFunc("/robots.txt", s.handleRobotsTxt()).Methods("GET")
 	s.router.HandleFunc("/xml", s.handleXML()).Methods("GET")
+	s.router.HandleFunc("/gzip", s.handleGzip()).Methods("GET")
 
 	// Dynamic Data
 	s.router.HandleFunc("/base64/{value}", s.handleBase64Decode()).Methods("GET")

@@ -84,3 +84,10 @@ func (s *Server) handleXML() http.HandlerFunc {
 		tmpl.Execute(w, "")
 	}
 }
+
+func (s *Server) handleGzip() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		keys := requestKeys{"headers", "method", "origin"}
+		returnRequestGzipped(w, r, keys)
+	}
+}

@@ -1,6 +1,7 @@
 package httpbin
 
 import (
+	"compress/gzip"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -20,6 +21,7 @@ type Request struct {
 	URL       string            `json:"url"`
 	Method    string            `json:"method"`
 	UserAgent string            `json:"user-agent"`
+	Gzipped   bool              `json:"gzipped"`
 }
 
 type requestKeys []string
@@ -33,6 +35,20 @@ func returnRequestAsJSON(w http.ResponseWriter, r *http.Request, keys requestKey
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(json)
+}
+
+func returnRequestGzipped(w http.ResponseWriter, r *http.Request, keys requestKeys) {
+	resp, err := RequestToJSON(r, keys)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	w.Header().Add("Content-Type", "application/json")
+	w.Header().Set("Content-Encoding", "gzip")
+
+	gz := gzip.NewWriter(w)
+	json.NewEncoder(gz).Encode(resp)
+	gz.Close()
 }
 
 // RequestToJSON parses an incoming http request and returns a bytes.Buffer
