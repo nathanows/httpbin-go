@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/ndwhtlssthr/httpbin-go/internal/app/httpbin"
+	"github.com/nathanows/httpbin-go/internal/app/httpbin"
 
 	"github.com/gorilla/mux"
 )

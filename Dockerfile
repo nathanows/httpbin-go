@@ -2,8 +2,8 @@ FROM golang:alpine as builder
 
 RUN adduser -D -g '' appuser
 
-COPY . $GOPATH/src/github.com/ndwhtlssthr/httpbin-go/
-WORKDIR $GOPATH/src/github.com/ndwhtlssthr/httpbin-go/cmd/httpbin-go
+COPY . $GOPATH/src/github.com/nathanows/httpbin-go/
+WORKDIR $GOPATH/src/github.com/nathanows/httpbin-go/cmd/httpbin-go
 COPY images/ /images/
 COPY templates/ /templates/
 

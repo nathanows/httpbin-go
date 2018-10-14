@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"github.com/ndwhtlssthr/httpbin-go/pkg/jsonparser"
+	"github.com/nathanows/httpbin-go/pkg/jsonparser"
 )
 
 var possibleResponseFields = []string{"args", "authenticated", "cookies", "data", "files", "form", "headers", "json", "method", "origin", "token", "url", "user", "user-agent", "uuid"}

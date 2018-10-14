@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/ndwhtlssthr/httpbin-go/pkg/jsonparser"
+	"github.com/nathanows/httpbin-go/pkg/jsonparser"
 )
 
 func TestParseRequest_URL_AbsTarget(t *testing.T) {
