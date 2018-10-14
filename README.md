@@ -1,6 +1,6 @@
 # httpbin-go: HTTP Request & Response Service
 
-![GitHub](https://img.shields.io/github/license/ndwhtlssthr/httpbin-go.svg) [![Build Status](https://travis-ci.org/ndwhtlssthr/httpbin-go.svg?branch=master)](https://travis-ci.org/ndwhtlssthr/httpbin-go) [![codecov](https://codecov.io/gh/ndwhtlssthr/httpbin-go/branch/master/graph/badge.svg)](https://codecov.io/gh/ndwhtlssthr/httpbin-go) [![Docker Pulls](https://img.shields.io/docker/pulls/nowsiany/httpbin-go.svg)](https://hub.docker.com/r/nowsiany/httpbin-go/)
+![GitHub](https://img.shields.io/github/license/nathanows/httpbin-go.svg) [![Build Status](https://travis-ci.org/nathanows/httpbin-go.svg?branch=master)](https://travis-ci.org/nathanows/httpbin-go) [![codecov](https://codecov.io/gh/nathanows/httpbin-go/branch/master/graph/badge.svg)](https://codecov.io/gh/nathanows/httpbin-go) [![Docker Pulls](https://img.shields.io/docker/pulls/nathanows/httpbin-go.svg)](https://hub.docker.com/r/nathanows/httpbin-go/)
 
 httpbin-go is a Go port of the popular [requests/httpbin](https://github.com/requests/httpbin), and its corresponding Docker image [kennethreitz/httpbin](https://hub.docker.com/r/kennethreitz/httpbin/).
 
@@ -11,7 +11,7 @@ The original httpbin Docker container tips the scales at ~500MB, httpbin-go is *
 
 ### Docker
 ```
-docker run -p 8080:8080 nowsiany/httpbin-go
+docker run -p 8080:8080 nathanows/httpbin-go
 ```
 
 ### Build and Run Locally
